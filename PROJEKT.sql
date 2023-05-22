@@ -1,0 +1,717 @@
+SAVEPOINT A;
+
+CREATE TABLE CHOROBY_PACJENTA 
+    ( 
+     ch_id             INTEGER  NOT NULL , 
+     nazwa_pl          VARCHAR2 (64 BYTE)  NOT NULL , 
+     nazwa_lac         VARCHAR2 (64 BYTE)  NOT NULL , 
+     droga_szerzenia   VARCHAR2 (100 CHAR) , 
+     data_aktualizacji DATE 
+    ) 
+;
+ALTER TABLE CHOROBY_PACJENTA 
+    ADD CONSTRAINT CHOROBY_PACJENTA_PK PRIMARY KEY ( ch_id ) ;
+
+SAVEPOINT B;
+
+CREATE TABLE ELEMENTY_KARTOTEKI 
+    ( 
+     ek_id          INTEGER  NOT NULL , 
+     numer          VARCHAR2 (5 CHAR)  NOT NULL , 
+     data_wpisu     DATE  NOT NULL , 
+     PACJENCI_p_id  INTEGER  NOT NULL , 
+     LEKARZE_lek_id INTEGER  NOT NULL 
+    ) 
+;
+CREATE UNIQUE INDEX "ELEMENTY KARTOTEKI__IDX" ON ELEMENTY_KARTOTEKI 
+    ( 
+     PACJENCI_p_id ASC 
+    ) 
+;
+
+ALTER TABLE ELEMENTY_KARTOTEKI 
+    ADD CONSTRAINT ELEMENTY_KARTOTEKI_PK PRIMARY KEY ( ek_id ) ;
+    
+
+SAVEPOINT C;
+
+CREATE TABLE GABINETY 
+    ( 
+     g_id   INTEGER  NOT NULL , 
+     numer  VARCHAR2 (5 CHAR)  NOT NULL , 
+     pietro VARCHAR2 (2 CHAR)  NOT NULL 
+    ) 
+;
+
+ALTER TABLE GABINETY 
+    ADD CONSTRAINT GABINETY_PK PRIMARY KEY ( g_id ) ;
+    
+SAVEPOINT D;
+
+CREATE TABLE LEKARZE 
+    ( 
+     lek_id            INTEGER  NOT NULL , 
+     imie              VARCHAR2 (20 CHAR)  NOT NULL , 
+     nazwisko          VARCHAR2 (20 CHAR)  NOT NULL , 
+     telefon           VARCHAR2 (9 CHAR) , 
+     data_zatrudnienia DATE  NOT NULL , 
+     data_zwolnienia   DATE , 
+     wynagrodzenie     NUMBER (10,2)  NOT NULL , 
+     ODDZIALY_o_id     INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE LEKARZE 
+    ADD CONSTRAINT LEKARZE_PK PRIMARY KEY ( lek_id ) ;
+    
+SAVEPOINT E;
+
+CREATE TABLE LEKI 
+    ( 
+     l_id  INTEGER  NOT NULL , 
+     nazwa VARCHAR2 (20 CHAR)  NOT NULL , 
+     forma VARCHAR2 (50 CHAR) 
+    ) 
+;
+
+ALTER TABLE LEKI 
+    ADD CONSTRAINT LEKI_PK PRIMARY KEY ( l_id ) ;
+   
+SAVEPOINT F;
+ 
+CREATE TABLE ODDZIALY 
+    ( 
+     o_id           INTEGER  NOT NULL , 
+     nazwa          VARCHAR2 (20 CHAR)  NOT NULL , 
+     lokalizacja    VARCHAR2 (60 CHAR)  NOT NULL , 
+     LEKARZE_lek_id INTEGER  NOT NULL 
+    ) 
+;
+
+CREATE UNIQUE INDEX ODDZIALY__IDX ON ODDZIALY 
+    ( 
+     LEKARZE_lek_id ASC 
+    ) 
+;
+
+
+ALTER TABLE ODDZIALY 
+    ADD CONSTRAINT ODDZIALY_PK PRIMARY KEY ( o_id ) ;
+
+SAVEPOINT G;   
+
+CREATE TABLE PACJENCI 
+    ( 
+     p_id                       INTEGER  NOT NULL , 
+     imie                       VARCHAR2 (20 CHAR)  NOT NULL , 
+     nazwisko                   VARCHAR2 (20 CHAR)  NOT NULL , 
+     data_urodzenia             DATE  NOT NULL , 
+     ulica                      VARCHAR2 (20 CHAR)  NOT NULL , 
+     miasto                     VARCHAR2 (20 CHAR)  NOT NULL , 
+     kod_pocztowy               VARCHAR2 (20 CHAR)  NOT NULL , 
+     nr_domu                    VARCHAR2 (6 CHAR) , 
+     nr_mieszkania              VARCHAR2 (6) , 
+     telefon                    VARCHAR2 (9 CHAR)  NOT NULL , 
+     data_zarejestrowania       DATE  NOT NULL , 
+     data_wyrejestrowania       DATE , 
+     pesel                      VARCHAR2 (11 CHAR) , 
+     ELEMENTY_KARTOTEKI_ek_id   INTEGER  NOT NULL 
+    ) 
+;
+
+CREATE UNIQUE INDEX PACJENCI__IDX ON PACJENCI 
+    ( 
+     "ELEMENTY KARTOTEKI_ek_id" ASC 
+    ) 
+;
+
+
+ALTER TABLE PACJENCI 
+    ADD CONSTRAINT PACJENCI_PK PRIMARY KEY ( p_id ) ;
+    
+SAVEPOINT H;
+
+CREATE TABLE PIELEGNIARKI 
+    ( 
+     pi_id             INTEGER  NOT NULL , 
+     imie              VARCHAR2 (20 CHAR)  NOT NULL , 
+     nazwisko          VARCHAR2 (20 CHAR)  NOT NULL , 
+     telefon           VARCHAR2 (9 CHAR) , 
+     data_zatrudnienia DATE  NOT NULL , 
+     data_zwolnienia   DATE , 
+     wynagrodzenie     NUMBER (10,2)  NOT NULL , 
+     ODDZIALY_o_id     INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE PIELEGNIARKI 
+    ADD CONSTRAINT PIELEGNIARKI_PK PRIMARY KEY ( pi_id ) ;
+
+SAVEPOINT I;
+
+CREATE TABLE SALE 
+    ( 
+     sa_id         INTEGER  NOT NULL , 
+     numer         VARCHAR2 (3 CHAR)  NOT NULL , 
+     pietro        VARCHAR2 (3 CHAR)  NOT NULL , 
+     rodzja        VARCHAR2 (20 CHAR)  NOT NULL , 
+     ODDZIALY_o_id INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE SALE 
+    ADD CONSTRAINT SALE_PK PRIMARY KEY ( sa_id ) ;
+    
+SAVEPOINT J;
+
+CREATE TABLE SPECJALIZACJE 
+    ( 
+     s_id    INTEGER  NOT NULL , 
+     nazwa   VARCHAR2 (20 CHAR)  NOT NULL , 
+     akronim VARCHAR2 (20 CHAR) 
+    ) 
+;
+
+ALTER TABLE SPECJALIZACJE 
+    ADD CONSTRAINT SPECJALIZACJE_PK PRIMARY KEY ( s_id ) ;
+    
+SAVEPOINT K;
+CREATE TABLE USLUGI_MEDYCZNE 
+    ( 
+     um_id         INTEGER  NOT NULL , 
+     nazwa         VARCHAR2 (20 CHAR)  NOT NULL , 
+     cena          NUMBER (10,2)  NOT NULL , 
+     data          DATE  NOT NULL , 
+     rodzaj        VARCHAR2 (20 CHAR)  NOT NULL , 
+     PACJENCI_p_id INTEGER  NOT NULL , 
+     SALE_sa_id    INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE USLUGI_MEDYCZNE 
+    ADD CONSTRAINT USLUGI_MEDYCZNE_PK PRIMARY KEY ( um_id ) ;
+    
+SAVEPOINT L;
+
+CREATE TABLE WIZYTY 
+    ( 
+     w_id           INTEGER  NOT NULL , 
+     data           DATE  NOT NULL , 
+     czas_trwania   VARCHAR2 (6 CHAR) NOT NULL , 
+     PACJENCI_p_id  INTEGER  NOT NULL , 
+     GABINETY_g_id  INTEGER  NOT NULL , 
+     LEKARZE_lek_id INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE WIZYTY 
+    ADD CONSTRAINT WIZYTY_PK PRIMARY KEY ( w_id ) ;
+    
+SAVEPOINT M;
+
+ALTER TABLE ELEMENTY_KARTOTEKI 
+    ADD CONSTRAINT ELEMENTY_KARTOTEKI_LEKARZE_FK FOREIGN KEY 
+    ( 
+     LEKARZE_lek_id
+    ) 
+    REFERENCES LEKARZE 
+    ( 
+     lek_id
+    ) 
+;
+
+ALTER TABLE ELEMENTY_KARTOTEKI 
+    ADD CONSTRAINT ELEMENTY_KARTOTEKI_PACJENCI_FK FOREIGN KEY 
+    ( 
+     PACJENCI_p_id
+    ) 
+    REFERENCES PACJENCI 
+    ( 
+     p_id
+    ) 
+;
+
+ALTER TABLE LEKARZE 
+    ADD CONSTRAINT LEKARZE_ODDZIALY_FK FOREIGN KEY 
+    ( 
+     ODDZIALY_o_id
+    ) 
+    REFERENCES ODDZIALY 
+    ( 
+     o_id
+    ) 
+;
+
+ALTER TABLE ODDZIALY 
+    ADD CONSTRAINT ODDZIALY_LEKARZE_FK FOREIGN KEY 
+    ( 
+     LEKARZE_lek_id
+    ) 
+    REFERENCES LEKARZE 
+    ( 
+     lek_id
+    ) 
+;
+
+ALTER TABLE PACJENCI 
+    ADD CONSTRAINT PACJENCI_ELEMENTY_KARTOTEKI_FK FOREIGN KEY 
+    ( 
+     ELEMENTY_KARTOTEKI_ek_id
+    ) 
+    REFERENCES ELEMENTY_KARTOTEKI 
+    ( 
+     ek_id
+    ) 
+;
+
+
+ALTER TABLE PIELEGNIARKI 
+    ADD CONSTRAINT PIELEGNIARKI_ODDZIALY_FK FOREIGN KEY 
+    ( 
+     ODDZIALY_o_id
+    ) 
+    REFERENCES ODDZIALY 
+    ( 
+     o_id
+    ) 
+;
+
+ALTER TABLE SALE 
+    ADD CONSTRAINT SALE_ODDZIALY_FK FOREIGN KEY 
+    ( 
+     ODDZIALY_o_id
+    ) 
+    REFERENCES ODDZIALY 
+    ( 
+     o_id
+    ) 
+;
+
+ALTER TABLE USLUGI_MEDYCZNE 
+    ADD CONSTRAINT USLUGI_MEDYCZNE_PACJENCI_FK FOREIGN KEY 
+    ( 
+     PACJENCI_p_id
+    ) 
+    REFERENCES PACJENCI 
+    ( 
+     p_id
+    ) 
+;
+
+ALTER TABLE USLUGI_MEDYCZNE 
+    ADD CONSTRAINT USLUGI_MEDYCZNE_SALE_FK FOREIGN KEY 
+    ( 
+     SALE_sa_id
+    ) 
+    REFERENCES SALE 
+    ( 
+     sa_id
+    ) 
+;
+
+ALTER TABLE WIZYTY 
+    ADD CONSTRAINT WIZYTY_GABINETY_FK FOREIGN KEY 
+    ( 
+     GABINETY_g_id
+    ) 
+    REFERENCES GABINETY 
+    ( 
+     g_id
+    ) 
+;
+
+ALTER TABLE WIZYTY 
+    ADD CONSTRAINT WIZYTY_LEKARZE_FK FOREIGN KEY 
+    ( 
+     LEKARZE_lek_id
+    ) 
+    REFERENCES LEKARZE 
+    ( 
+     lek_id
+    ) 
+;
+
+ALTER TABLE WIZYTY 
+    ADD CONSTRAINT WIZYTY_PACJENCI_FK FOREIGN KEY 
+    ( 
+     PACJENCI_p_id
+    ) 
+    REFERENCES PACJENCI 
+    ( 
+     p_id
+    ) 
+;
+
+SAVEPOINT M;
+
+CREATE TABLE Relation_10 
+    ( 
+     SPECJALIZACJE_s_id INTEGER  NOT NULL , 
+     LEKARZE_lek_id     INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE Relation_10 
+    ADD CONSTRAINT Relation_10_PK PRIMARY KEY ( SPECJALIZACJE_s_id, LEKARZE_lek_id ) ;
+
+CREATE TABLE Relation_13 
+    ( 
+     USLUGI_MEDYCZNE_um_id   INTEGER  NOT NULL , 
+     PIELEGNIARKI_pi_id      INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE Relation_13 
+    ADD CONSTRAINT Relation_13_PK PRIMARY KEY ( USLUGI_MEDYCZNE_um_id, PIELEGNIARKI_pi_id ) ;
+
+CREATE TABLE Relation_2 
+    ( 
+     ELEMENTY_KARTOTEKI_ek_id   INTEGER  NOT NULL , 
+     LEKI_l_id                  INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE Relation_2 
+    ADD CONSTRAINT Relation_2_PK PRIMARY KEY ( ELEMENTY_KARTOTEKI_ek_id, LEKI_l_id ) ;
+
+CREATE TABLE Relation_3 
+    ( 
+     ELEMENTY_KARTOTEKI_ek_id   INTEGER  NOT NULL , 
+     CHOROBY_PACJENTA_ch_id     INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE Relation_3 
+    ADD CONSTRAINT Relation_3_PK PRIMARY KEY ( ELEMENTY_KARTOTEKI_ek_id, CHOROBY_PACJENTA_ch_id ) ;
+
+CREATE TABLE Relation_9 
+    ( 
+     USLUGI_MEDYCZNE_um_id   INTEGER  NOT NULL , 
+     LEKARZE_lek_id          INTEGER  NOT NULL 
+    ) 
+;
+
+ALTER TABLE Relation_9 
+    ADD CONSTRAINT Relation_9_PK PRIMARY KEY ( USLUGI_MEDYCZNE_um_id, LEKARZE_lek_id ) ;
+
+SAVEPOINT N;
+
+ALTER TABLE Relation_10 
+    ADD CONSTRAINT Relation_10_LEKARZE_FK FOREIGN KEY 
+    ( 
+     LEKARZE_lek_id
+    ) 
+    REFERENCES LEKARZE 
+    ( 
+     lek_id
+    ) 
+;
+
+ALTER TABLE Relation_10 
+    ADD CONSTRAINT Relation_10_SPECJALIZACJE_FK FOREIGN KEY 
+    ( 
+     SPECJALIZACJE_s_id
+    ) 
+    REFERENCES SPECJALIZACJE 
+    ( 
+     s_id
+    ) 
+;
+
+ALTER TABLE Relation_13 
+    ADD CONSTRAINT Relation_13_PIELEGNIARKI_FK FOREIGN KEY 
+    ( 
+     PIELEGNIARKI_pi_id
+    ) 
+    REFERENCES PIELEGNIARKI 
+    ( 
+     pi_id
+    ) 
+;
+
+ALTER TABLE Relation_13 
+    ADD CONSTRAINT Relation_13_USLUGI_MEDYCZNE_FK FOREIGN KEY 
+    ( 
+     USLUGI_MEDYCZNE_um_id
+    ) 
+    REFERENCES USLUGI_MEDYCZNE 
+    ( 
+     um_id
+    ) 
+;
+
+ALTER TABLE Relation_2 
+    ADD CONSTRAINT Rell2_ELEMENTY_KARTOTEKI_FK FOREIGN KEY 
+    ( 
+     ELEMENTY_KARTOTEKI_ek_id
+    ) 
+    REFERENCES ELEMENTY_KARTOTEKI 
+    ( 
+     ek_id
+    ) 
+;
+
+ALTER TABLE Relation_2 
+    ADD CONSTRAINT Relation_2_LEKI_FK FOREIGN KEY 
+    ( 
+     LEKI_l_id
+    ) 
+    REFERENCES LEKI 
+    ( 
+     l_id
+    ) 
+;
+
+ALTER TABLE Relation_3 
+    ADD CONSTRAINT Relation_3_CHOROBY_PACJENTA_FK FOREIGN KEY 
+    ( 
+     CHOROBY_PACJENTA_ch_id
+    ) 
+    REFERENCES CHOROBY_PACJENTA 
+    ( 
+     ch_id
+    ) 
+;
+
+
+ALTER TABLE Relation_3 
+    ADD CONSTRAINT Rel_3_ELEMENTY_KARTOTEKI_FK FOREIGN KEY 
+    ( 
+     ELEMENTY_KARTOTEKI_ek_id
+    ) 
+    REFERENCES ELEMENTY_KARTOTEKI 
+    ( 
+     ek_id
+    ) 
+;
+
+ALTER TABLE Relation_9 
+    ADD CONSTRAINT Relation_9_LEKARZE_FK FOREIGN KEY 
+    ( 
+     LEKARZE_lek_id
+    ) 
+    REFERENCES LEKARZE 
+    ( 
+     lek_id
+    ) 
+;
+
+ALTER TABLE Relation_9 
+    ADD CONSTRAINT Relation_9_USLUGI_MEDYCZNE_FK FOREIGN KEY 
+    ( 
+     USLUGI_MEDYCZNE_um_id
+    ) 
+    REFERENCES USLUGI_MEDYCZNE 
+    ( 
+     um_id
+    ) 
+;
+
+SAVEPOINT O;
+
+INSERT INTO CHOROBY_PACJENTA VALUES (01,'grypa','flu','droga kropelkowa',TO_DATE('2003/07/09', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (02,'zapalenie p³uc','pneumonia','w wyniku powik³añ po infekcji',TO_DATE('2003/07/10', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (03,'angina','tonsillitis purulenta acuta','droga kropelkowa',TO_DATE('2003/07/10', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (04,'zapalenie oskrzeli','bronchitis acuta','droga kropelkowa',TO_DATE('2003/07/10', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (05,'gruŸlica ','tuberculosis','droga kropelkowa',TO_DATE('2003/09/12', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (06,'b³onica ','diphtheria','droga kropelkowa',TO_DATE('2003/09/12', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (07,'odra ','morbilli','droga kropelkowa',TO_DATE('2003/09/12', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (08,'zapalenie miêœnia sercowego','myocarditis','w wyniku powik³añ po infekcji',TO_DATE('2004/01/23', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (09,'zapalenie opon mózgowych','meningitis cerebrospinalis purulenta','w wyniku powik³añ po infekcji',TO_DATE('2004/01/23', 'yyyy/mm/dd')); 
+INSERT INTO CHOROBY_PACJENTA VALUES (10,'COVID-19 ','COVID-19','droga kropelkowa',TO_DATE('2020/03/05', 'yyyy/mm/dd'));
+
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (201,00123, TO_DATE('2003/08/11', 'yyyy/mm/dd'),101,301);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (202,00124, TO_DATE('2005/11/13', 'yyyy/mm/dd'),102,305);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (203,00125, TO_DATE('2005/11/10', 'yyyy/mm/dd'),103,302);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (204,00126, TO_DATE('2008/03/05', 'yyyy/mm/dd'),104,301);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (205,00127, TO_DATE('2013/06/23', 'yyyy/mm/dd'),105,301);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (206,00128, TO_DATE('2013/10/11', 'yyyy/mm/dd'),106,307);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (207,00129, TO_DATE('2014/09/01', 'yyyy/mm/dd'),107,305);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (208,00130, TO_DATE('2018/11/09', 'yyyy/mm/dd'),108,303);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (209,00131, TO_DATE('2020/05/02', 'yyyy/mm/dd'),109,303);
+INSERT INTO ELEMENTY_KARTOTEKI  VALUES (210,00132, TO_DATE('2020/07/11', 'yyyy/mm/dd'),110,304);
+
+INSERT INTO GABINETY VALUES (401, 'A101', '1');
+INSERT INTO GABINETY VALUES (402, 'A102', '1');
+INSERT INTO GABINETY VALUES (403, 'A103', '1');
+INSERT INTO GABINETY VALUES (404, 'A201', '2');
+INSERT INTO GABINETY VALUES (405, 'A202', '2');
+INSERT INTO GABINETY VALUES (406, 'A203', '2');
+INSERT INTO GABINETY VALUES (407, 'B101', '1');
+INSERT INTO GABINETY VALUES (408, 'B102', '1');
+INSERT INTO GABINETY VALUES (409, 'B103', '1');
+INSERT INTO GABINETY VALUES (410, 'B104', '1');
+INSERT INTO GABINETY VALUES (411, 'B105', '1');
+INSERT INTO GABINETY VALUES (412, 'C201', '2');
+INSERT INTO GABINETY VALUES (413, 'C202', '2');
+INSERT INTO GABINETY VALUES (414, 'C301', '3');
+INSERT INTO GABINETY VALUES (415, 'C302', '3');
+
+INSERT INTO LEKARZE VALUES (301, 'Grzegorz', 'Markowski', '567432999', TO_DATE('2003/01/03', 'yyyy/mm/dd'), null, 12500.00, 2001);
+INSERT INTO LEKARZE VALUES (302, 'Robert', 'Mak³owicz', '567333979', TO_DATE('2003/01/03', 'yyyy/mm/dd'), null, 12500.00, 2002);
+INSERT INTO LEKARZE VALUES (303, 'Robert', 'Kubica', '576429379', TO_DATE('2003/01/03', 'yyyy/mm/dd'), TO_DATE('2011/03/03', 'yyyy/mm/dd'), 5500.00, 2003);
+INSERT INTO LEKARZE VALUES (304, 'Monika', 'Brodka', '632642999', TO_DATE('2003/01/03', 'yyyy/mm/dd'), TO_DATE('2011/04/12', 'yyyy/mm/dd'), 7500.00, 2004);
+INSERT INTO LEKARZE VALUES (305, 'Daria', 'Zawia³ow', '675123972', TO_DATE('2003/01/03', 'yyyy/mm/dd'), null, 12500.00, 2005);
+INSERT INTO LEKARZE VALUES (306, 'Patrycja', 'Markowska', '623912762', TO_DATE('2009/06/01', 'yyyy/mm/dd'), null, 8500.00, 2002);
+INSERT INTO LEKARZE VALUES (307, 'Wojciech', 'Szczêsny', '543765239', TO_DATE('2009/01/03', 'yyyy/mm/dd'), null, 6500.00, 2001);
+INSERT INTO LEKARZE VALUES (308, 'Edyta', 'Bartosiewicz', '512873927', TO_DATE('2003/01/03', 'yyyy/mm/dd'), null, 12500.00, 2003);
+INSERT INTO LEKARZE VALUES (309, 'Krzysztof', 'Zalewski', '763982638', TO_DATE('2003/01/03', 'yyyy/mm/dd'), null, 12500.00, 2004);
+INSERT INTO LEKARZE VALUES (310, 'Jakub', 'Karaœ', '562836199', TO_DATE('2010/01/03', 'yyyy/mm/dd'), null, 8500.00, 2005);
+INSERT INTO LEKARZE VALUES (311, 'Robert', 'Lewandowski', '562836199', TO_DATE('2011/03/23', 'yyyy/mm/dd'), null, 7500.00, 2003);
+INSERT INTO LEKARZE VALUES (312, 'Piotr', 'Rogucki', '562836199', TO_DATE('2011/04/25', 'yyyy/mm/dd'), null, 6500.00, 2004);
+INSERT INTO LEKARZE VALUES (313, 'Piotr', 'Fronczewski', '632879324', TO_DATE('2016/07/01', 'yyyy/mm/dd'), null, 7500.00, 2001);
+INSERT INTO LEKARZE VALUES (314, 'Olga', 'Sipowicz', '632879324', TO_DATE('2016/07/01', 'yyyy/mm/dd'), null, 8500.00, 2001);
+INSERT INTO LEKARZE VALUES (315, 'Felicjan', 'Andrzejczak', '632879324', TO_DATE('2018/02/01', 'yyyy/mm/dd'), null, 8500.00, 2004);
+
+INSERT INTO LEKI VALUES (11001, 'aspiryna', 'tabletki');
+INSERT INTO LEKI VALUES (11002, 'ibuprofen', 'tabletki');
+INSERT INTO LEKI VALUES (11003, 'ibuprofen', 'syrop');
+INSERT INTO LEKI VALUES (11004, 'paracetamol', 'syrop');
+INSERT INTO LEKI VALUES (11005, 'paracetamol', 'tabletki');
+INSERT INTO LEKI VALUES (11006, 'streptomycyna', 'roztwór');
+INSERT INTO LEKI VALUES (11007, 'pyrazynamid', 'roztwór');
+INSERT INTO LEKI VALUES (11008, 'mesalazyna', 'roztwór');
+INSERT INTO LEKI VALUES (11009, 'doksycyklina', 'roztwór');
+INSERT INTO LEKI VALUES (11010, 'adrenalina', 'roztwór');
+INSERT INTO LEKI VALUES (11011, 'glukoza', 'roztwór');
+INSERT INTO LEKI VALUES (11012, 'budezonid', 'krople');
+INSERT INTO LEKI VALUES (11013, 'penicylamina', 'tabletki');
+INSERT INTO LEKI VALUES (11014, 'oksytocyna', 'roztwór');
+INSERT INTO LEKI VALUES (11015, 'azytromycyna', 'krople');
+
+INSERT INTO ODDZIALY VALUES (2001, 'Chirurgia', 'skrzyd³o A',301);
+INSERT INTO ODDZIALY VALUES (2002, 'Gastrologia', 'skrzyd³o A',302);
+INSERT INTO ODDZIALY VALUES (2003, 'Chirurgia', 'skrzyd³o A',307);
+INSERT INTO ODDZIALY VALUES (2004, 'Gastrologia', 'skrzyd³o A',306);
+INSERT INTO ODDZIALY VALUES (2005, 'Ginekologia', 'skrzyd³o B',308);
+INSERT INTO ODDZIALY VALUES (2006, 'Ginekologia', 'skrzyd³o B',311);
+INSERT INTO ODDZIALY VALUES (2007, 'Ortopedia', 'skrzyd³o B',309);
+INSERT INTO ODDZIALY VALUES (2008, 'Ortopedia', 'skrzyd³o B',312);
+INSERT INTO ODDZIALY VALUES (2009, 'Pediatria', 'skrzyd³o C',305);
+INSERT INTO ODDZIALY VALUES (2010, 'Pediatria', 'skrzyd³o C',310);
+
+INSERT INTO PACJENCI VALUES (101, 'Anna', 'Kowalska', TO_DATE('1973/11/09', 'yyyy/mm/dd'), 'Kwiatowa', 'Poznañ', '60-634', '15', '21', '733633833', TO_DATE('2003/08/16', 'yyyy/mm/dd'), TO_DATE('2003/08/30', 'yyyy/mm/dd'), '73110912345',201);
+INSERT INTO PACJENCI VALUES (102, 'Borys', 'Przybylski', TO_DATE('1998/04/21', 'yyyy/mm/dd'), 'Ogrodowa', 'Bydgoszcz', '72-122', '33', null, '789123543', TO_DATE('2005/11/12', 'yyyy/mm/dd'), TO_DATE('2005/11/25', 'yyyy/mm/dd'), '98042198765', 202);
+INSERT INTO PACJENCI VALUES (103, 'Filip', 'Szczeœniak', TO_DATE('1990/07/29', 'yyyy/mm/dd'), 'Warszawska', 'Poznañ', '60-664', '21', '38', '545235887', TO_DATE('2005/11/03', 'yyyy/mm/dd'), TO_DATE('2005/11/15', 'yyyy/mm/dd'), '90072945673', 203);
+INSERT INTO PACJENCI VALUES (104, 'Katarzyna', 'Nosowska', TO_DATE('1971/08/30', 'yyyy/mm/dd'), 'Szczeciñska', 'Poznañ', '60-867', '24a', null, '765787876', TO_DATE('2008/03/03', 'yyyy/mm/dd'), TO_DATE('2008/03/08', 'yyyy/mm/dd'), '71083098734', 204);
+INSERT INTO PACJENCI VALUES (105, 'Dawid', 'Podsiad³o', TO_DATE('1993/05/23', 'yyyy/mm/dd'), 'Górnicza', 'Poznañ', '60-687', '55', '33', '587687123', TO_DATE('2013/06/12', 'yyyy/mm/dd'), TO_DATE('2013/06/23', 'yyyy/mm/dd'), '93052367834', 205);
+INSERT INTO PACJENCI VALUES (106, 'Katarzyna', 'Sochacka', TO_DATE('2008/02/22', 'yyyy/mm/dd'), 'Górnicza', 'Poznañ', '60-687', '55', '33', '587687123', TO_DATE('2013/10/11', 'yyyy/mm/dd'), TO_DATE('2013/10/29', 'yyyy/mm/dd'), '08222288876', 206);
+INSERT INTO PACJENCI VALUES (107, 'Vito', 'Bambino', TO_DATE('2007/04/27', 'yyyy/mm/dd'), 'Katowicka', 'Poznañ', '60-744', '55', '13', '545871121', TO_DATE('2014/08/29', 'yyyy/mm/dd'), TO_DATE('2014/09/09', 'yyyy/mm/dd'), '07142745621', 207);
+INSERT INTO PACJENCI VALUES (108, 'Zuzanna', 'Grabowska', TO_DATE('2010/09/02', 'yyyy/mm/dd'), 'Warszawska', 'Poznañ', '60-664', '24', '15', '998543678', TO_DATE('2018/11/03', 'yyyy/mm/dd'), TO_DATE('2018/11/10', 'yyyy/mm/dd'), '10190222233', 208);
+INSERT INTO PACJENCI VALUES (109, 'Janusz', 'Panasewicz', TO_DATE('1956/01/18', 'yyyy/mm/dd'), 'Lipska', 'Oborniki', '64-600', '12', null, '554324533', TO_DATE('2020/04/29', 'yyyy/mm/dd'), TO_DATE('2020/05/09', 'yyyy/mm/dd'), '56011854376', 209);
+INSERT INTO PACJENCI VALUES (110, 'Artur', 'Rojek', TO_DATE('1972/05/06', 'yyyy/mm/dd'), 'Mys³owicka', 'Szamotu³y', '64-500', '32b', null, '776886345', TO_DATE('2020/07/02', 'yyyy/mm/dd'), TO_DATE('2020/07/11', 'yyyy/mm/dd'), '72050687623', 210);
+
+INSERT INTO PIELEGNIARKI VALUES(601,'Anna', 'Kowalska', '123456789', TO_DATE('2022/01/01', 'yyyy/mm/dd'), TO_DATE('2022/01/01', 'yyyy/mm/dd'), 5000.00, 2001);
+INSERT INTO PIELEGNIARKI VALUES(602,'Jakub', 'Grabowski', '579852632', TO_DATE('2009/01/01', 'yyyy/mm/dd'), null, 7500.00, 2001);
+INSERT INTO PIELEGNIARKI VALUES(603,'Ma³gorzata', 'Wiewióra', '741852963', TO_DATE('2020/08/01', 'yyyy/mm/dd'), null, 4500.00, 2002);
+INSERT INTO PIELEGNIARKI VALUES(604,'Lilianna', 'Ludwiczak', '789456123', TO_DATE('2022/08/01', 'yyyy/mm/dd'), null, 6500.00, 2003);
+INSERT INTO PIELEGNIARKI VALUES(605,'Kinga', 'Malina', '456789123', TO_DATE('2021/09/01', 'yyyy/mm/dd'), null, 6800.00, 2005);
+
+INSERT INTO SALE VALUES(701,'SA1','1','operacyjna', 2001);
+INSERT INTO SALE VALUES(702,'SA2','2','diagnostyczna', 2003);
+INSERT INTO SALE VALUES(703,'SA3','1','rehabilitacyjna', 2004);
+INSERT INTO SALE VALUES(705,'SA4','3','operacyjna', 2001);
+INSERT INTO SALE VALUES(706,'SA5','2','diagnostyczna', 2003);
+
+INSERT INTO SPECJALIZACJE VALUES (501, 'neurochirurg', 'chg');
+INSERT INTO SPECJALIZACJE VALUES (502, 'ortopeda', 'ort');
+INSERT INTO SPECJALIZACJE VALUES (503, 'anestezjolog', 'ant');
+INSERT INTO SPECJALIZACJE VALUES (504, 'gastrolog', 'gst');
+INSERT INTO SPECJALIZACJE VALUES (505, 'ginekolog', 'gin');
+INSERT INTO SPECJALIZACJE VALUES (506, 'endokrynolog', 'end');
+INSERT INTO SPECJALIZACJE VALUES (507, 'pediatra', 'pdt');
+INSERT INTO SPECJALIZACJE VALUES (508, 'onkolog', 'onk');
+INSERT INTO SPECJALIZACJE VALUES (509, 'chirurg plastyk', 'chp');
+INSERT INTO SPECJALIZACJE VALUES (510, 'chirurg naczyniowy', 'chn');
+
+INSERT INTO USLUGI_MEDYCZNE VALUES(901,'Badanie krwi',62,TO_DATE('2022/05/06','yyyy/mm/dd'),'diagnostyczne',101,702);
+INSERT INTO USLUGI_MEDYCZNE VALUES(902,'Rehabilitacja',150,TO_DATE('2022/06/06','yyyy/mm/dd'),'diagnostyczne',103,702);
+INSERT INTO USLUGI_MEDYCZNE VALUES(903,'Tomografia komp.',250,TO_DATE('2022/07/06','yyyy/mm/dd'),'diagnostyczne',105,706);
+INSERT INTO USLUGI_MEDYCZNE VALUES(904,'Laparoskopia',500,TO_DATE('2022/08/06','yyyy/mm/dd'),'operacyjne',106,701);
+INSERT INTO USLUGI_MEDYCZNE VALUES(905,'Endoskopia',600,TO_DATE('2022/09/06','yyyy/mm/dd'),'diagnostyczne',107,702);
+
+INSERT INTO WIZYTY VALUES (11111, TO_DATE('2008/05/06 15:00:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 110,401, 301);
+INSERT INTO WIZYTY VALUES (11112, TO_DATE('2008/03/23 17:30:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 101,401, 301);
+INSERT INTO WIZYTY VALUES (11113, TO_DATE('2010/05/06 10:00:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 103,410, 304);
+INSERT INTO WIZYTY VALUES (11114, TO_DATE('2010/05/06 10:00:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 104,407, 303);
+INSERT INTO WIZYTY VALUES (11115, TO_DATE('2010/12/23 11:00:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 104,403, 306);
+INSERT INTO WIZYTY VALUES (11116, TO_DATE('2010/12/23 11:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 108,413, 305);
+INSERT INTO WIZYTY VALUES (11117, TO_DATE('2012/01/05 13:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 101,405, 301);
+INSERT INTO WIZYTY VALUES (11118, TO_DATE('2012/01/05 13:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 105,406, 302);
+INSERT INTO WIZYTY VALUES (11119, TO_DATE('2016/05/17 10:30:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 101,409, 311);
+INSERT INTO WIZYTY VALUES (11120, TO_DATE('2020/06/18 15:00:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 102,404, 302);
+INSERT INTO WIZYTY VALUES (11121, TO_DATE('2020/12/18 12:00:00', 'yyyy/mm/dd hh24:mi:ss'), '60min', 109,405, 312);
+INSERT INTO WIZYTY VALUES (11122, TO_DATE('2021/04/04 13:00:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 107,412, 305);
+INSERT INTO WIZYTY VALUES (11123, TO_DATE('2021/08/18 13:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 107,409, 308);
+INSERT INTO WIZYTY VALUES (11124, TO_DATE('2021/12/11 14:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 104,407, 311);
+INSERT INTO WIZYTY VALUES (11125, TO_DATE('2022/01/05 13:30:00', 'yyyy/mm/dd hh24:mi:ss'), '30min', 106,408, 312);
+
+INSERT INTO RELATION_10 VALUES (501, 301);
+INSERT INTO RELATION_10 VALUES (502, 309);
+INSERT INTO RELATION_10 VALUES (502, 312);
+INSERT INTO RELATION_10 VALUES (502, 306);
+INSERT INTO RELATION_10 VALUES (502, 304);
+INSERT INTO RELATION_10 VALUES (503, 309);
+INSERT INTO RELATION_10 VALUES (503, 313);
+INSERT INTO RELATION_10 VALUES (504, 302);
+INSERT INTO RELATION_10 VALUES (504, 306);
+INSERT INTO RELATION_10 VALUES (505, 308);
+INSERT INTO RELATION_10 VALUES (505, 311);
+INSERT INTO RELATION_10 VALUES (505, 303);
+INSERT INTO RELATION_10 VALUES (506, 308);
+INSERT INTO RELATION_10 VALUES (507, 305);
+INSERT INTO RELATION_10 VALUES (507, 310);
+INSERT INTO RELATION_10 VALUES (508, 307);
+INSERT INTO RELATION_10 VALUES (509, 314);
+INSERT INTO RELATION_10 VALUES (510, 315);
+
+INSERT INTO RELATION_2 VALUES (201, 11002);
+INSERT INTO RELATION_2 VALUES (201, 11008);
+INSERT INTO RELATION_2 VALUES (202, 11002);
+INSERT INTO RELATION_2 VALUES (202, 11009);
+INSERT INTO RELATION_2 VALUES (203, 11001);
+INSERT INTO RELATION_2 VALUES (203, 11005);
+INSERT INTO RELATION_2 VALUES (203, 11006);
+INSERT INTO RELATION_2 VALUES (203, 11015);
+INSERT INTO RELATION_2 VALUES (204, 11001);
+INSERT INTO RELATION_2 VALUES (204, 11007);
+INSERT INTO RELATION_2 VALUES (204, 11008);
+INSERT INTO RELATION_2 VALUES (205, 11010);
+INSERT INTO RELATION_2 VALUES (205, 11013);
+INSERT INTO RELATION_2 VALUES (206, 11004);
+INSERT INTO RELATION_2 VALUES (206, 11006);
+INSERT INTO RELATION_2 VALUES (207, 11004);
+INSERT INTO RELATION_2 VALUES (207, 11013);
+INSERT INTO RELATION_2 VALUES (207, 11001);
+INSERT INTO RELATION_2 VALUES (208, 11002);
+INSERT INTO RELATION_2 VALUES (208, 11013);
+INSERT INTO RELATION_2 VALUES (209, 11002);
+INSERT INTO RELATION_2 VALUES (209, 11012);
+INSERT INTO RELATION_2 VALUES (210, 11002);
+INSERT INTO RELATION_2 VALUES (210, 11012);
+
+INSERT INTO RELATION_3 VALUES (201, 06);
+INSERT INTO RELATION_3 VALUES (202, 07);
+INSERT INTO RELATION_3 VALUES (203, 03);
+INSERT INTO RELATION_3 VALUES (203, 05);
+INSERT INTO RELATION_3 VALUES (204, 05);
+INSERT INTO RELATION_3 VALUES (205, 08);
+INSERT INTO RELATION_3 VALUES (206, 05);
+INSERT INTO RELATION_3 VALUES (207, 08);
+INSERT INTO RELATION_3 VALUES (208, 02);
+INSERT INTO RELATION_3 VALUES (208, 08);
+INSERT INTO RELATION_3 VALUES (209, 04);
+INSERT INTO RELATION_3 VALUES (210, 04);
+
+INSERT INTO RELATION_13 VALUES(901,602);
+INSERT INTO RELATION_13 VALUES(902,603);
+INSERT INTO RELATION_13 VALUES(903,605);
+INSERT INTO RELATION_13 VALUES(904,605);
+INSERT INTO RELATION_13 VALUES(905,601);
+
+INSERT INTO RELATION_9 VALUES(901,302);
+INSERT INTO RELATION_9 VALUES(902,305);
+INSERT INTO RELATION_9 VALUES(903,314);
+INSERT INTO RELATION_9 VALUES(904,301);
+INSERT INTO RELATION_9 VALUES(905,311);
+
